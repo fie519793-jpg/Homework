@@ -1,0 +1,46 @@
+name: Build Homework Dashboard
+
+on:
+  schedule:
+    # Runs at 11:30 UTC every day. Adjust for your timezone -
+    # e.g. if you're US Central (UTC-5/UTC-6), 11:30 UTC is
+    # ~5:30-6:30 AM local time.
+    - cron: "30 11 * * *"
+  workflow_dispatch: {}  # lets you also trigger it manually from GitHub's UI
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build dashboard
+        env:
+          CANVAS_URL: ${{ secrets.CANVAS_URL }}
+          CANVAS_TOKEN: ${{ secrets.CANVAS_TOKEN }}
+          TODOIST_TOKEN: ${{ secrets.TODOIST_TOKEN }}
+        run: python3 fetch_and_build.py
+
+      - name: Prepare Pages folder
+        run: |
+          mkdir -p public
+          cp dashboard.html public/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
