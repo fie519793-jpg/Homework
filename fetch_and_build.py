@@ -148,7 +148,7 @@ def get_todoist_tasks(config):
         return []
     headers = {"Authorization": f"Bearer {token}"}
     # "overdue | today" filter query, per Todoist REST API v2 filter syntax
-    url = "https://api.todoist.com/rest/v2/tasks?filter=" + urllib.parse_quote(
+    url = "https://api.todoist.com/rest/v2/tasks?filter=" + urllib.parse.quote(
         "overdue | today"
     )
     tasks = http_get_json(url, headers)
